@@ -1,3 +1,4 @@
+using Application.Core.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace Application.Infrastructure.DAL

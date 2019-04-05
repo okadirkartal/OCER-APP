@@ -1,13 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using Application.Business;
 using Application.Core;
+using Application.Core.Models;
 using Application.Core.Models.ViewModels;
-using Application.Infrastructure;
 using Application.Infrastructure.DAL;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace Application.API.Controllers
 {
@@ -19,21 +20,21 @@ namespace Application.API.Controllers
 
         private readonly IRepository<UserEquipments> _repository;
 
-        private readonly IRepository<RentalFeeTypes> _rentalFeeTypesRepository;
-
         private readonly IRepository<EquipmentTypes> _equipmentTypesRepository;
 
         private readonly IRepository<Equipments> _equipmentsRepository;
 
+        private readonly IPriceCalculator _priceCalculator;
+
         public UserEquipmentsController(IRepository<UserEquipments> repository,
-            IRepository<RentalFeeTypes> rentalFeeTypesRepository,
             IRepository<EquipmentTypes> equipmentTypesRepository,
-            IRepository<Equipments> equipmentsRepository)
+            IRepository<Equipments> equipmentsRepository,
+            IPriceCalculator priceCalculator)
         {
             _repository = repository;
-            _rentalFeeTypesRepository = rentalFeeTypesRepository;
-            _equipmentTypesRepository = equipmentTypesRepository;
+             _equipmentTypesRepository = equipmentTypesRepository;
             _equipmentsRepository = equipmentsRepository;
+            _priceCalculator = priceCalculator;
         }
 
 
@@ -56,6 +57,7 @@ namespace Application.API.Controllers
         {
             try
             {
+
                 await _repository.Add(new UserEquipments
                 {
                     EquipmentId = model.EquipmentId,
@@ -105,9 +107,9 @@ namespace Application.API.Controllers
         {
             List<Equipments> equipments = null;
             if (equipmentId != 0)
-                equipments = _equipmentsRepository.Where(x => x.Id == equipmentId).ToList();
+                equipments = await _equipmentsRepository.Where(x => x.Id == equipmentId).ToListAsync();
             else
-                equipments = _equipmentsRepository.All().ToList();
+                equipments = await _equipmentsRepository.All().ToListAsync();
 
             List<UserEquipmentViewModel> returnList = GetExtendedEquipmentViewModel(equipments);
 
@@ -120,15 +122,15 @@ namespace Application.API.Controllers
         {
             Invoice invoice = new Invoice() { Equipments = new List<InvoiceOfEquipment>() };
 
-            var userEquipments = _repository.Where(x => x.UserId == userId).ToList();
+            var userEquipments = await _repository.Where(x => x.UserId == userId).ToListAsync();
 
             var equipmentTypes = _equipmentTypesRepository.All();
 
             foreach (var item in userEquipments)
             {
-                var equipment = _equipmentsRepository.Where(x => x.Id == item.EquipmentId).Single();
+                var equipment = await _equipmentsRepository.Where(x => x.Id == item.EquipmentId).SingleAsync();
 
-                var price = CalculateRentalFee(item);
+                var price =_priceCalculator.CalculateRentalFee(item);
 
                 invoice.TotalPrice += price;
 
@@ -146,7 +148,7 @@ namespace Application.API.Controllers
                 });
             }
 
-            invoice.LoyaltPoint = CalculateLoyaltyPoint(userEquipments);
+            invoice.LoyaltPoint = _priceCalculator.CalculateLoyaltyPoint(userEquipments);
 
             return invoice;
         }
@@ -182,87 +184,11 @@ namespace Application.API.Controllers
             return returnList;
         }
 
-        private int FindMinimumRentalDay(Equipments model)
-        {
-            int equipmentType = (int)model.Type;
+       
 
-            return (from q in _equipmentTypesRepository.Table
-                    where q.Id == equipmentType
-                    select new
-                    {
-                        q.MinimumRentalDay
-                    }).Single().MinimumRentalDay;
-        }
+        
 
-        private int CalculateLoyaltyPoint(List<UserEquipments> model)
-        {
-            var loyaltyPoint = 0;
-
-            foreach (var item in model)
-            {
-                var equipment = _equipmentsRepository.Where(x => x.Id == item.EquipmentId).Single();
-
-                loyaltyPoint += (equipment.Type == (int)EnmEquipmentTypes.Heavy) ? 2 : 1;
-            }
-
-            return loyaltyPoint;
-        }
-
-        private decimal CalculateRentalFee(UserEquipments model)
-        {
-            decimal resultFee = 0m;
-
-            var equipment = _equipmentsRepository.Where(x => x.Id == model.EquipmentId).Single();
-
-            var feeTypes = _rentalFeeTypesRepository.All();
-
-            var minimumRentalDay = FindMinimumRentalDay(equipment);
-
-
-            string OneTimeRentalFee = nameof(EnmFeeTypes.OneTimeRentalFee);
-            string PremiumDailyFee = nameof(EnmFeeTypes.PremiumDailyFee);
-            string RegularDailyFee = nameof(EnmFeeTypes.RegularDailyFee);
-
-            switch (equipment.Type)
-            {
-                case (int)EnmEquipmentTypes.Heavy:
-                    {
-                        resultFee = feeTypes.Single(x => x.FeeType == OneTimeRentalFee).Fee +
-                                    (feeTypes.Single(x => x.FeeType == PremiumDailyFee).Fee *
-                                     model.RentDay);
-                        break;
-                    }
-                case (int)EnmEquipmentTypes.Regular:
-                    {
-                        var premiumDailyFee =
-                            feeTypes.Single(x => x.FeeType == PremiumDailyFee);
-
-
-                        resultFee += feeTypes.Single(x => x.FeeType == OneTimeRentalFee).Fee +
-                                     premiumDailyFee.Fee * minimumRentalDay;
-                        if (model.RentDay > minimumRentalDay)
-                        {
-                            resultFee += (feeTypes.Single(x => x.FeeType == RegularDailyFee).Fee *
-                                          (model.RentDay - minimumRentalDay));
-                        }
-
-                        break; 
-                    }
-                case (int)EnmEquipmentTypes.Specialized:
-                    {
-                        resultFee += (feeTypes.Single(x => x.FeeType == PremiumDailyFee).Fee *
-                                      minimumRentalDay);
-                        if (model.RentDay > minimumRentalDay)
-                        {
-                            resultFee += (feeTypes.Single(x => x.FeeType == RegularDailyFee).Fee *
-                                          (model.RentDay - minimumRentalDay));
-                        }
-
-                        break;
-                    }
-            }
-            return resultFee;
-        }
+       
         #endregion
     }
 }

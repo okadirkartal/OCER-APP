@@ -1,8 +1,8 @@
 using System;
 using System.ComponentModel.DataAnnotations;
 
-namespace Application.Infrastructure
-{
+namespace Application.Core.Models
+{ 
     public class UserEquipments
     {
         [Key]

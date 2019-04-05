@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace Application.Infrastructure
+namespace Application.Core.Models
 {
     public class Invoice
     {

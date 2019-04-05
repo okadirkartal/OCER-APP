@@ -1,3 +1,9 @@
+using Application.Core.Models;
+using Application.Web.Models;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -7,12 +13,6 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
-using Application.Infrastructure;
-using Application.Web.Models;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Caching.Memory;
-using Microsoft.Extensions.Configuration;
 using ViewModels = Application.Core.Models.ViewModels;
 
 namespace Application.Web.Controllers
@@ -104,23 +104,30 @@ namespace Application.Web.Controllers
         public async Task<IActionResult> Add(int equipmentId)
         {
             ViewBag.Title = "Add To Cart";
+            if (ViewBag.UserEquipmentViewModel != null)
+                return View((ViewModels.UserEquipmentViewModel)ViewBag.UserEquipmentViewModel);
+
             AddHeader("equipmentId", equipmentId.ToString());
             HttpResponseMessage response = await _client.GetAsync($"UserEquipments/EquipmentList/");
 
             List<ViewModels.UserEquipmentViewModel> result = null;
             if (response.IsSuccessStatusCode)
             {
+                
                 result = await response.Content.ReadAsAsync<List<ViewModels.UserEquipmentViewModel>>();
             }
+            var item = result.Single();
 
-            return View(result.Single());
+            return View(item);
         }
 
 
         [HttpPost, ValidateAntiForgeryToken]
         public async Task<IActionResult> Add(ViewModels.UserEquipmentViewModel model)
         {
-            if (model.UserRentalDay == 0)
+            ViewBag.UserEquipmentViewModel = model;
+
+            if (model.UserRentalDay <= 0)
             {
                 ModelState.AddModelError("rentalDayError", "Please enter a rental day");
                 return View(model);

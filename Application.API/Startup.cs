@@ -1,4 +1,5 @@
-﻿using Application.Infrastructure.DAL;
+﻿using Application.Business;
+using Application.Infrastructure.DAL;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Cors.Infrastructure;
 using Microsoft.AspNetCore.Hosting;
@@ -40,11 +41,12 @@ namespace Application.API
 
             services.AddDbContext<ApplicationDBContext>(context =>
             {
-                context.UseInMemoryDatabase("OCERDB_1");
+                context.UseInMemoryDatabase("OCERDB");
                 context.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
             });
  
             services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
+            services.AddScoped(typeof(IPriceCalculator), typeof(PriceCalculator));
 
             services.AddCors(options => { options.AddPolicy("AllowOrigin", GenerateCorsPolicy()); });
         }

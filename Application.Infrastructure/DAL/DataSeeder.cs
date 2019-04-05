@@ -1,5 +1,6 @@
+using Application.Core;
+using Application.Core.Models;
 using System.Collections.Generic;
-using Application.Core; 
 
 namespace Application.Infrastructure.DAL
 {
