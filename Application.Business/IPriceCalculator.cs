@@ -5,7 +5,7 @@ namespace Application.Business
 {
     public interface IPriceCalculator
     {
-        int FindMinimumRentalDay(Equipments model);
+        int FindPreDefinedDay(Equipments model);
 
         int CalculateLoyaltyPoint(List<UserEquipments> model);
 

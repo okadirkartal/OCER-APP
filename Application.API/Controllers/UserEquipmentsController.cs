@@ -175,7 +175,7 @@ namespace Application.API.Controllers
                 {
                     EquipmentId = item.Id,
                     EquipmentName = item.Name,
-                    MinimumRentalDay = equipmentType.MinimumRentalDay,
+                    PreDefinedDay = equipmentType.PreDefinedDay,
                     EquipmentTypeName = equipmentType.Name,
                     EquipmentTypeId = item.Type
                 });

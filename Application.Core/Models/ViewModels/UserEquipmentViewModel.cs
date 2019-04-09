@@ -12,7 +12,7 @@ namespace Application.Core.Models.ViewModels
 
         public string EquipmentName { get; set; }
 
-        public int MinimumRentalDay { get; set; }
+        public int PreDefinedDay { get; set; }
 
         public int UserRentalDay { get; set; }
     }

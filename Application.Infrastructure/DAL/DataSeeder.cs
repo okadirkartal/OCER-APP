@@ -9,9 +9,9 @@ namespace Application.Infrastructure.DAL
         public static void SeedData(ApplicationDBContext context)
         {
            var equipmentTypes = new List<EquipmentTypes>{
-                new EquipmentTypes {Id = 1, Name = nameof(EnmEquipmentTypes.Heavy), MinimumRentalDay = 0},
-                new EquipmentTypes {Id = 2, Name = nameof(EnmEquipmentTypes.Regular), MinimumRentalDay = 2},
-                new EquipmentTypes {Id = 3, Name = nameof(EnmEquipmentTypes.Specialized), MinimumRentalDay = 3}};
+                new EquipmentTypes {Id = 1, Name = nameof(EnmEquipmentTypes.Heavy), PreDefinedDay = 0},
+                new EquipmentTypes {Id = 2, Name = nameof(EnmEquipmentTypes.Regular), PreDefinedDay = 2},
+                new EquipmentTypes {Id = 3, Name = nameof(EnmEquipmentTypes.Specialized), PreDefinedDay = 3}};
 
             var rentalFeeTypes = new List<RentalFeeTypes>
             {

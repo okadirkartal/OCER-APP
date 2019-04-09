@@ -21,8 +21,7 @@
         <tr>
             <th>Equipment Id</th>
             <th>Equipment Type</th>
-            <th>Equipment Name</th>
-            <th>Minimum Rental Day</th>
+            <th>Equipment Name</th> 
             <th>Edit</th>
         </tr>
 
@@ -32,7 +31,6 @@
                 <td>@item.EquipmentId </td>
                 <td>@item.EquipmentTypeName</td>
                 <td>@item.EquipmentName</td>
-                <td>@(item.MinimumRentalDay == 0 ? "Unlimited" : item.MinimumRentalDay.ToString())</td>
                 <td>@Html.ActionLink("Add To Cart", "Add", "Home", new {equipmentId = @item.EquipmentId})</td>
 
             </tr>

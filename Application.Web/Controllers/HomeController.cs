@@ -104,8 +104,8 @@ namespace Application.Web.Controllers
         public async Task<IActionResult> Add(int equipmentId)
         {
             ViewBag.Title = "Add To Cart";
-            if (ViewBag.UserEquipmentViewModel != null)
-                return View((ViewModels.UserEquipmentViewModel)ViewBag.UserEquipmentViewModel);
+            if (ViewData["UserEquipmentViewModel"] != null)
+                return View((ViewModels.UserEquipmentViewModel)ViewData["UserEquipmentViewModel"]);
 
             AddHeader("equipmentId", equipmentId.ToString());
             HttpResponseMessage response = await _client.GetAsync($"UserEquipments/EquipmentList/");
@@ -125,20 +125,14 @@ namespace Application.Web.Controllers
         [HttpPost, ValidateAntiForgeryToken]
         public async Task<IActionResult> Add(ViewModels.UserEquipmentViewModel model)
         {
-            ViewBag.UserEquipmentViewModel = model;
+            ViewData["UserEquipmentViewModel"] = model;
 
             if (model.UserRentalDay <= 0)
             {
                 ModelState.AddModelError("rentalDayError", "Please enter a rental day");
                 return View(model);
             }
-
-            if (model.MinimumRentalDay > 0 && model.UserRentalDay < model.MinimumRentalDay)
-            {
-                ModelState.AddModelError("rentalDayError", "Rental day is less or greater than Minimum Rental Day");
-                return View(model);
-            }
-
+             
             model.UserId = GetUserId();
 
             HttpResponseMessage response = await _client.PostAsJsonAsync("UserEquipments/Add/", model);

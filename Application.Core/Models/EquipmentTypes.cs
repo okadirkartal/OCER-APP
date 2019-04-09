@@ -9,6 +9,6 @@ namespace Application.Core.Models
 
         public string Name { get; set; }      
         
-        public int MinimumRentalDay { get; set; }
+        public int PreDefinedDay { get; set; }
     }
 }

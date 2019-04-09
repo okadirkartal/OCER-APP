@@ -3,7 +3,7 @@
 
 <form id="editForm" method="post" asp-action="Add" asp-controller="Home">
 
-    @Html.ValidationSummary(false, "", new {@class = "text-danger"})
+    @Html.ValidationSummary(false, "", new { @class = "text-danger" })
     @Html.AntiForgeryToken()
 
     <table class="table table-striped table-bordered table-responsive table-condensed table-hover">
@@ -16,19 +16,11 @@
             <td>Equipment Name</td>
             <td>@Html.LabelForModel(Model.EquipmentName)</td>
         </tr>
-
-        <tr>
-            <td>Minimum Rental Day</td>
-            <td>
-                @Html.LabelForModel(Model.MinimumRentalDay)
-               
-                    </td>
-        </tr>
-
+         
 
         <tr>
             <td>Rent Day</td>
-            <td>@Html.TextBoxFor(model => model.UserRentalDay, new {maxlength = 10})</td>
+            <td>@Html.TextBoxFor(model => model.UserRentalDay, new { maxlength = 10 })</td>
         </tr>
 
         <tr>
@@ -39,7 +31,11 @@
 
     </table>
 
-    @Html.HiddenFor(model => model.MinimumRentalDay)
+    @Html.HiddenFor(model => model.PreDefinedDay)
     @Html.HiddenFor(model => model.EquipmentId)
     @Html.HiddenFor(model => model.EquipmentTypeId)
+
+    @Html.HiddenFor(model => model.EquipmentTypeName)
+
+    @Html.HiddenFor(model => model.EquipmentName)
 </form>
