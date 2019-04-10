@@ -76,7 +76,7 @@ namespace Application.UnitTests
         }
 
         [Test]
-        public void CalculateLoyaltPoint_WithValidEquipmentType_ReturnsTrue()
+        public void CalculateLoyaltyPoint_WithValidEquipmentType_ReturnsTrue()
         {
             var equipments = new List<UserEquipments>
             {
