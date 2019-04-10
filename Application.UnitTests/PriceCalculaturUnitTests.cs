@@ -11,8 +11,6 @@ namespace Application.UnitTests
     [TestFixture]
     public class PriceCalculaturUnitTests
     {
-        //UnitOfWork_InıtıialCondition_RedirectsToHome
-        //UsersLogIn_WithValidCredentials_RedirectsToHome
         private Mock<PriceCalculator> _priceCalculator;
         private IQueryable<RentalFeeTypes> feeTypes;
 
@@ -26,14 +24,14 @@ namespace Application.UnitTests
                   new  RentalFeeTypes{ Fee=60m,FeeType=nameof(EnmFeeTypes.PremiumDailyFee)},
                     new  RentalFeeTypes{ Fee=40m,FeeType=nameof(EnmFeeTypes.RegularDailyFee)},
             }.AsQueryable();
-        } 
+        }
 
         //Arrange -> Act -> Assert
         [Test]
         public void IsValidRentalFee_WhenAddHeavyEquipment_ReturnsTrue()
         {
             var equipment = new Equipments { Id = 1, Type = (int)EnmEquipmentTypes.Heavy };
- 
+
             _priceCalculator.Setup(x => x.FindPreDefinedDay(equipment)).Returns(0);
             var result = _priceCalculator.Object.CalculateRentalFee(equipment, 3, feeTypes);
 
@@ -45,7 +43,7 @@ namespace Application.UnitTests
         public void IsValidRentalFee_WhenRegularEquipment_ReturnsTrue()
         {
             var equipment = new Equipments { Id = 1, Type = (int)EnmEquipmentTypes.Regular };
-             
+
             _priceCalculator.Setup(x => x.FindPreDefinedDay(equipment)).Returns(2);
             var result = _priceCalculator.Object.CalculateRentalFee(equipment, 1, feeTypes);
             Assert.AreEqual(160m, result);
