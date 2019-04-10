@@ -12,15 +12,14 @@ namespace Application.Business
 
         private readonly IRepository<EquipmentTypes>  _equipmentTypesRepository;
 
-        private readonly IRepository<RentalFeeTypes> _rentalFeeTypesRepository;
 
-        public PriceCalculator(IRepository<Equipments> equipmentsRepository, IRepository<EquipmentTypes> equipmentTypesRepository, IRepository<RentalFeeTypes> rentalFeeTypesRepository)
+        public PriceCalculator() { }
+
+        public PriceCalculator(IRepository<Equipments> equipmentsRepository, IRepository<EquipmentTypes> equipmentTypesRepository)
         {
             _equipmentsRepository = equipmentsRepository;
             _equipmentTypesRepository = equipmentTypesRepository;
-            _rentalFeeTypesRepository = rentalFeeTypesRepository;
         }
-
 
         public int FindPreDefinedDay(Equipments model)
         {
@@ -47,16 +46,9 @@ namespace Application.Business
             return loyaltyPoint;
         }
 
-
-
-
-        public decimal CalculateRentalFee(UserEquipments model)
+        public virtual decimal CalculateRentalFee(Equipments equipment,int RentDay,IQueryable<RentalFeeTypes> feeTypes)
         {
             decimal resultFee = 0m;
-
-            var equipment = _equipmentsRepository.Where(x => x.Id == model.EquipmentId).Single();
-
-            var feeTypes = _rentalFeeTypesRepository.All();
 
             var preDefinedDay = FindPreDefinedDay(equipment);
 
@@ -71,7 +63,7 @@ namespace Application.Business
                     {
                         resultFee = feeTypes.Single(x => x.FeeType == OneTimeRentalFee).Fee +
                                     (feeTypes.Single(x => x.FeeType == PremiumDailyFee).Fee *
-                                     model.RentDay);
+                                    RentDay);
                         break;
                     }
                 case (int)EnmEquipmentTypes.Regular:
@@ -81,11 +73,11 @@ namespace Application.Business
 
 
                         resultFee += feeTypes.Single(x => x.FeeType == OneTimeRentalFee).Fee +
-                                     premiumDailyFee.Fee *(model.RentDay>preDefinedDay?preDefinedDay:model.RentDay);
-                        if (model.RentDay > preDefinedDay)
+                                     premiumDailyFee.Fee *(RentDay>preDefinedDay?preDefinedDay:RentDay);
+                        if (RentDay > preDefinedDay)
                         {
                             resultFee += (feeTypes.Single(x => x.FeeType == RegularDailyFee).Fee *
-                                          (model.RentDay-preDefinedDay));
+                                          (RentDay-preDefinedDay));
                         }
 
                         break;
@@ -93,11 +85,11 @@ namespace Application.Business
                 case (int)EnmEquipmentTypes.Specialized:
                     {
                         resultFee += (feeTypes.Single(x => x.FeeType == PremiumDailyFee).Fee *
-                                      (model.RentDay>preDefinedDay?preDefinedDay:model.RentDay));
-                        if (model.RentDay > preDefinedDay)
+                                      (RentDay>preDefinedDay?preDefinedDay:RentDay));
+                        if (RentDay > preDefinedDay)
                         {
                             resultFee += (feeTypes.Single(x => x.FeeType == RegularDailyFee).Fee *
-                                          (model.RentDay - preDefinedDay));
+                                          (RentDay - preDefinedDay));
                         }
 
                         break;

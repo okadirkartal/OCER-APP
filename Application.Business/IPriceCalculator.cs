@@ -1,5 +1,6 @@
 ﻿using Application.Core.Models;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Application.Business
 {
@@ -9,6 +10,6 @@ namespace Application.Business
 
         int CalculateLoyaltyPoint(List<UserEquipments> model);
 
-        decimal CalculateRentalFee(UserEquipments model);
+        decimal CalculateRentalFee(Equipments equipment, int RentDay, IQueryable<RentalFeeTypes> feeTypes);
     }
 }

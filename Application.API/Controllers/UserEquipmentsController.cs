@@ -26,15 +26,19 @@ namespace Application.API.Controllers
 
         private readonly IPriceCalculator _priceCalculator;
 
+        private readonly IRepository<RentalFeeTypes> _rentalFeeTypesRepository;
+
         public UserEquipmentsController(IRepository<UserEquipments> repository,
             IRepository<EquipmentTypes> equipmentTypesRepository,
             IRepository<Equipments> equipmentsRepository,
-            IPriceCalculator priceCalculator)
+            IPriceCalculator priceCalculator,
+            IRepository<RentalFeeTypes> rentalFeeTypesRepository)
         {
             _repository = repository;
              _equipmentTypesRepository = equipmentTypesRepository;
             _equipmentsRepository = equipmentsRepository;
             _priceCalculator = priceCalculator;
+            _rentalFeeTypesRepository = rentalFeeTypesRepository;
         }
 
 
@@ -130,7 +134,7 @@ namespace Application.API.Controllers
             {
                 var equipment = await _equipmentsRepository.Where(x => x.Id == item.EquipmentId).SingleAsync();
 
-                var price =_priceCalculator.CalculateRentalFee(item);
+                var price =_priceCalculator.CalculateRentalFee(equipment,item.RentDay, _rentalFeeTypesRepository.All());
 
                 invoice.TotalPrice += price;
 
