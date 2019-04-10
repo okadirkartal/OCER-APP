@@ -10,6 +10,6 @@ namespace Application.Business
 
         int CalculateLoyaltyPoint(List<UserEquipments> model);
 
-        decimal CalculateRentalFee(Equipments equipment, int RentDay, IQueryable<RentalFeeTypes> feeTypes);
+        decimal  CalculateRentalFee(Equipments equipment, int RentDay, IQueryable<RentalFeeTypes> feeTypes);
     }
 }

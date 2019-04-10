@@ -8,20 +8,17 @@ namespace Application.Business
 {
    public class PriceCalculator:IPriceCalculator
     {
-        private readonly IRepository<Equipments> _equipmentsRepository;
 
         private readonly IRepository<EquipmentTypes>  _equipmentTypesRepository;
 
-
         public PriceCalculator() { }
 
-        public PriceCalculator(IRepository<Equipments> equipmentsRepository, IRepository<EquipmentTypes> equipmentTypesRepository)
+        public PriceCalculator(IRepository<EquipmentTypes> equipmentTypesRepository)
         {
-            _equipmentsRepository = equipmentsRepository;
             _equipmentTypesRepository = equipmentTypesRepository;
         }
 
-        public int FindPreDefinedDay(Equipments model)
+        public virtual int FindPreDefinedDay(Equipments model)
         {
             int equipmentType = (int)model.Type;
 
@@ -32,21 +29,19 @@ namespace Application.Business
                         q.PreDefinedDay}).Single().PreDefinedDay;
         }
 
-        public int CalculateLoyaltyPoint(List<UserEquipments> model)
+        public virtual int CalculateLoyaltyPoint(List<UserEquipments> model)
         {
             var loyaltyPoint = 0;
 
             foreach (var item in model)
             {
-                var equipment = _equipmentsRepository.Where(x => x.Id == item.EquipmentId).Single();
-
-                loyaltyPoint += (equipment.Type == (int)EnmEquipmentTypes.Heavy) ? 2 : 1;
+                loyaltyPoint += (item.EquipmentTypeId == (int)EnmEquipmentTypes.Heavy) ? 2 : 1;
             }
 
             return loyaltyPoint;
         }
 
-        public virtual decimal CalculateRentalFee(Equipments equipment,int RentDay,IQueryable<RentalFeeTypes> feeTypes)
+        public virtual  decimal CalculateRentalFee(Equipments equipment,int RentDay,IQueryable<RentalFeeTypes> feeTypes)
         {
             decimal resultFee = 0m;
 

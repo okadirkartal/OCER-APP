@@ -35,7 +35,7 @@ namespace Application.API.Controllers
             IRepository<RentalFeeTypes> rentalFeeTypesRepository)
         {
             _repository = repository;
-             _equipmentTypesRepository = equipmentTypesRepository;
+            _equipmentTypesRepository = equipmentTypesRepository;
             _equipmentsRepository = equipmentsRepository;
             _priceCalculator = priceCalculator;
             _rentalFeeTypesRepository = rentalFeeTypesRepository;
@@ -130,11 +130,15 @@ namespace Application.API.Controllers
 
             var equipmentTypes = _equipmentTypesRepository.All();
 
-            foreach (var item in userEquipments)
+            for (int i = 0; i < userEquipments.Count; i++)
             {
+                var item = userEquipments[i];
+
                 var equipment = await _equipmentsRepository.Where(x => x.Id == item.EquipmentId).SingleAsync();
 
-                var price =_priceCalculator.CalculateRentalFee(equipment,item.RentDay, _rentalFeeTypesRepository.All());
+                item.EquipmentTypeId = equipment.Type;
+
+                var price = _priceCalculator.CalculateRentalFee(equipment, item.RentDay, _rentalFeeTypesRepository.All());
 
                 invoice.TotalPrice += price;
 
@@ -188,11 +192,11 @@ namespace Application.API.Controllers
             return returnList;
         }
 
-       
 
-        
 
-       
+
+
+
         #endregion
     }
 }

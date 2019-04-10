@@ -12,6 +12,8 @@ namespace Application.Core.Models
         
         public int EquipmentId { get; set; }
 
+        public int EquipmentTypeId { get; set; }
+
         public int RentDay { get; set; } 
         
         public DateTime OperationDate { get; set; }
