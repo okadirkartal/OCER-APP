@@ -11,9 +11,19 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Application.API", "Applicat
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Application.Web", "Application.Web\Application.Web.csproj", "{583AE0E8-82BE-4319-9348-E29AFA591423}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Application.Business", "Application.Business\Application.Business.csproj", "{63CC3E99-5C14-4FCE-B3F8-94D27ED7C294}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Application.Business", "Application.Business\Application.Business.csproj", "{63CC3E99-5C14-4FCE-B3F8-94D27ED7C294}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Application.UnitTests", "Application.UnitTests\Application.UnitTests.csproj", "{60AD09C2-3BCE-4777-865C-CA0330050DEE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Application.UnitTests", "Application.UnitTests\Application.UnitTests.csproj", "{60AD09C2-3BCE-4777-865C-CA0330050DEE}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "OCER_APP_ANGULAR_UI", "OCER_APP_ANGULAR_UI", "{0244AEC9-13F0-420C-9709-36B23FEC6918}"
+	ProjectSection(SolutionItems) = preProject
+		..\..\..\..\..\Projects\Angular\OCER-APP-UI\angular.json = ..\..\..\..\..\Projects\Angular\OCER-APP-UI\angular.json
+		..\..\..\..\..\Projects\Angular\OCER-APP-UI\package-lock.json = ..\..\..\..\..\Projects\Angular\OCER-APP-UI\package-lock.json
+		..\..\..\..\..\Projects\Angular\OCER-APP-UI\package.json = ..\..\..\..\..\Projects\Angular\OCER-APP-UI\package.json
+		..\..\..\..\..\Projects\Angular\OCER-APP-UI\README.md = ..\..\..\..\..\Projects\Angular\OCER-APP-UI\README.md
+		..\..\..\..\..\Projects\Angular\OCER-APP-UI\tsconfig.json = ..\..\..\..\..\Projects\Angular\OCER-APP-UI\tsconfig.json
+		..\..\..\..\..\Projects\Angular\OCER-APP-UI\tslint.json = ..\..\..\..\..\Projects\Angular\OCER-APP-UI\tslint.json
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

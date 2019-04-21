@@ -1,0 +1,33 @@
+
+<div class="card">
+  <div class="card-header">{{pageTitle}}</div>
+
+<div class="card-body">
+    <div class="table-responsive">
+        <table class="table" *ngFor="let item of equipment">
+         
+          <tbody>
+            <tr>
+            <td>Equipment Type</td>
+              <td>{{item.equipmentTypeName}}</td>
+            </tr>
+            <tr>
+              <td>Equipment Name</td>
+              <td>{{item.equipmentName}}</td>        
+            </tr>
+            <tr>
+                <td>Rent Day</td>
+                <td><input type="text"   width=20 class="form-control" id="txtRentDay" [(ngModel)]="userRentalDay" value={{item.userRentalDay}} /></td>
+            </tr>
+            
+      <tr>
+          <td colspan="3">
+              <button class="btn btn-inverse" type="submit" (click)="addEquipment()">Add To Card</button>
+          </td>
+      </tr>
+          </tbody>
+        </table>
+      </div>
+</div>
+</div>
+

@@ -1,0 +1,61 @@
+
+<div class="card">
+    <div class="card-header">{{pageTitle}}</div>
+    <div class="card-body">
+    <div class="table-responsive">
+      <table class="table">
+       <thead>
+          <tr>
+              <th>Invoice Id</th>
+              <th>Invoice Date</th>
+              <th>Equipment Type</th>
+              <th>Equipment Name</th>
+              <th>Rental Day</th>
+              <th>Rental Fee</th>
+              <th>Remove</th>
+          </tr>
+       </thead>
+        <tbody>
+            <tr *ngFor="let item of equipments">
+                <td>{{item.invoiceId}}</td>
+                <td>{{item.invoiceDate | date:'medium'}}</td>
+                <td>{{item.equipmentType}}</td>
+                <td>{{item.equipmentName}}</td>
+                <td>{{item.equipmentRentalDay}}</td>
+                <td>{{item.equipmentRentalFee}} €</td>
+                <td>
+                    <button type="button" class="btn btn-danger" (click)='removeEquipment(item.equipmentId)'>Remove</button> 
+                </td>
+            </tr>
+            <tr>
+                <td colspan="6">
+                    <b>Loyalty Point</b>
+                </td>
+                <td>
+                    <b>{{invoice.loyaltPoint}}</b>
+                </td>
+            </tr>
+    
+            <tr>
+                <td colspan="6">
+                    <b>Total Fee</b>
+                </td>
+                <td>
+                    <b>{{invoice.totalPrice}}</b>
+                </td>
+            </tr>
+    
+            <tr>
+                <td colspan="6">  
+                </td>
+                <td>
+                    <b><button type="button" class="btn btn-success" (click)="dynamicDownloadTxt()">Download Report</button></b>
+                </td>
+            </tr>
+        </tbody>
+      </table>
+    </div>
+    </div>
+  </div>
+  
+  
