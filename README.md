@@ -10,7 +10,7 @@ Application.Core -> Core functionalities(Class Library)
 
 Application.Infrastructure -> Infrastructure layer for Data Access,Repositories(Class Library)
 
-Application.Web -> Frontend Project(ASP.NET Core MVC) or could use ANGULAR FRONTEND APP in OCERAPP-UI folder
+Application.Web -> Frontend Project(ASP.NET Core MVC) or could use ANGULAR FRONTEND APP in OCER-APP-UI folder
 
 The API project should then be run on the Web project
 
