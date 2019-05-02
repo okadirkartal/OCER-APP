@@ -28,53 +28,28 @@ namespace Application.UnitTests
 
         //Arrange -> Act -> Assert
         [Test]
-        public void IsValidRentalFee_WhenAddHeavyEquipment_ReturnsTrue()
+        [TestCase(1,EnmEquipmentTypes.Heavy,0,3,280)]
+        [TestCase(1,EnmEquipmentTypes.Regular,2,1,160)]
+        [TestCase(1,EnmEquipmentTypes.Specialized,3,1,60)]
+        [TestCase(2,EnmEquipmentTypes.Specialized,3,2,120)]     
+        [TestCase(2,EnmEquipmentTypes.Specialized,3,3,180)]       
+        [TestCase(2,EnmEquipmentTypes.Specialized,3,4,220)]
+        public void IsValidRentalFee_WhenAddEquipment_ReturnsTrue(int equipmentId,int equipmentType,
+            int preDefinedDay,int rentDay,decimal rentalFee)
         {
-            var equipment = new Equipments { Id = 1, Type = (int)EnmEquipmentTypes.Heavy };
+            var equipment = new Equipments { Id = equipmentId, Type = (int)equipmentType };
 
-            _priceCalculator.Setup(x => x.FindPreDefinedDay(equipment)).Returns(0);
-            var result = _priceCalculator.Object.CalculateRentalFee(equipment, 3, feeTypes);
+            _priceCalculator.Setup(x => x.FindPreDefinedDay(equipment)).Returns(preDefinedDay);
+            var result = _priceCalculator.Object.CalculateRentalFee(equipment, rentDay, feeTypes);
 
-            _priceCalculator.Verify(x => x.CalculateRentalFee(equipment, 3, feeTypes), Times.Once());
-            Assert.AreEqual(280m, result);
+            _priceCalculator.Verify(x => x.CalculateRentalFee(equipment, rentDay, feeTypes), Times.Once());
+            Assert.AreEqual(rentalFee, result);
         }
 
-        [Test]
-        public void IsValidRentalFee_WhenRegularEquipment_ReturnsTrue()
-        {
-            var equipment = new Equipments { Id = 1, Type = (int)EnmEquipmentTypes.Regular };
-
-            _priceCalculator.Setup(x => x.FindPreDefinedDay(equipment)).Returns(2);
-            var result = _priceCalculator.Object.CalculateRentalFee(equipment, 1, feeTypes);
-            Assert.AreEqual(160m, result);
-
-            result = _priceCalculator.Object.CalculateRentalFee(equipment, 2, feeTypes);
-            Assert.AreEqual(220m, result);
-
-            result = _priceCalculator.Object.CalculateRentalFee(equipment, 3, feeTypes);
-            Assert.AreEqual(260m, result);
-        }
+        
 
 
-        [Test]
-        public void IsValidRentalFee_WhenSpecializedEquipment_ReturnsTrue()
-        {
-            var equipment = new Equipments { Id = 1, Type = (int)EnmEquipmentTypes.Specialized };
-
-            _priceCalculator.Setup(x => x.FindPreDefinedDay(equipment)).Returns(3);
-            var result = _priceCalculator.Object.CalculateRentalFee(equipment, 1, feeTypes);
-            Assert.AreEqual(60m, result);
-
-            result = _priceCalculator.Object.CalculateRentalFee(equipment, 2, feeTypes);
-            Assert.AreEqual(120m, result);
-
-            result = _priceCalculator.Object.CalculateRentalFee(equipment, 3, feeTypes);
-            Assert.AreEqual(180m, result);
-
-            result = _priceCalculator.Object.CalculateRentalFee(equipment, 4, feeTypes);
-            Assert.AreEqual(220m, result);
-        }
-
+      
         [Test]
         public void CalculateLoyaltyPoint_WithValidEquipmentType_ReturnsTrue()
         {
