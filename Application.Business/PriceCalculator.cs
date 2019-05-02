@@ -41,7 +41,7 @@ namespace Application.Business
             return loyaltyPoint;
         }
 
-        public virtual  decimal CalculateRentalFee(Equipments equipment,int RentDay,IQueryable<RentalFeeTypes> feeTypes)
+        public virtual  decimal CalculateRentalFee(Equipments equipment,int rentDay,IQueryable<RentalFeeTypes> feeTypes)
         {
             decimal resultFee = 0m;
 
@@ -58,7 +58,7 @@ namespace Application.Business
                     {
                         resultFee = feeTypes.Single(x => x.FeeType == OneTimeRentalFee).Fee +
                                     (feeTypes.Single(x => x.FeeType == PremiumDailyFee).Fee *
-                                    RentDay);
+                                     rentDay);
                         break;
                     }
                 case (int)EnmEquipmentTypes.Regular:
@@ -68,11 +68,11 @@ namespace Application.Business
 
 
                         resultFee += feeTypes.Single(x => x.FeeType == OneTimeRentalFee).Fee +
-                                     premiumDailyFee.Fee *(RentDay>preDefinedDay?preDefinedDay:RentDay);
-                        if (RentDay > preDefinedDay)
+                                     premiumDailyFee.Fee *(rentDay>preDefinedDay?preDefinedDay:rentDay);
+                        if (rentDay > preDefinedDay)
                         {
                             resultFee += (feeTypes.Single(x => x.FeeType == RegularDailyFee).Fee *
-                                          (RentDay-preDefinedDay));
+                                          (rentDay-preDefinedDay));
                         }
 
                         break;
@@ -80,11 +80,11 @@ namespace Application.Business
                 case (int)EnmEquipmentTypes.Specialized:
                     {
                         resultFee += (feeTypes.Single(x => x.FeeType == PremiumDailyFee).Fee *
-                                      (RentDay>preDefinedDay?preDefinedDay:RentDay));
-                        if (RentDay > preDefinedDay)
+                                      (rentDay>preDefinedDay?preDefinedDay:rentDay));
+                        if (rentDay > preDefinedDay)
                         {
                             resultFee += (feeTypes.Single(x => x.FeeType == RegularDailyFee).Fee *
-                                          (RentDay - preDefinedDay));
+                                          (rentDay - preDefinedDay));
                         }
 
                         break;
