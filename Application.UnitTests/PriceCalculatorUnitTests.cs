@@ -9,7 +9,7 @@ using System.Linq;
 namespace Application.UnitTests
 {
     [TestFixture]
-    public class PriceCalculaturUnitTests
+    public class PriceCalculatorUnitTests
     {
         private Mock<PriceCalculator> _priceCalculator;
         private IQueryable<RentalFeeTypes> feeTypes;
@@ -45,12 +45,8 @@ namespace Application.UnitTests
             _priceCalculator.Verify(x => x.CalculateRentalFee(equipment, rentDay, feeTypes), Times.Once());
             Assert.AreEqual(rentalFee, result);
         }
-
         
-
-
-      
-        [Test]
+        [Test] 
         public void CalculateLoyaltyPoint_WithValidEquipmentType_ReturnsTrue()
         {
             var equipments = new List<UserEquipments>
@@ -70,6 +66,5 @@ namespace Application.UnitTests
             result = _priceCalculator.Object.CalculateLoyaltyPoint(equipments);
             Assert.AreEqual(6, result);
         }
-
     }
 }
