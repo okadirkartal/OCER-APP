@@ -2,6 +2,8 @@ namespace Application.Core.Models.ViewModels
 {
     public class UserEquipmentViewModel
     {
+        public int Id { get; set; }
+        
         public int UserId { get; set; }
 
         public int EquipmentId { get; set; }

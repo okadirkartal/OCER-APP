@@ -13,8 +13,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Application.Web", "Applicat
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Application.Business", "Application.Business\Application.Business.csproj", "{63CC3E99-5C14-4FCE-B3F8-94D27ED7C294}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Application.UnitTests", "Application.UnitTests\Application.UnitTests.csproj", "{60AD09C2-3BCE-4777-865C-CA0330050DEE}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "OCER_APP_ANGULAR_UI", "OCER_APP_ANGULAR_UI", "{0244AEC9-13F0-420C-9709-36B23FEC6918}"
 	ProjectSection(SolutionItems) = preProject
 		..\..\..\..\..\Projects\Angular\OCER-APP-UI\angular.json = ..\..\..\..\..\Projects\Angular\OCER-APP-UI\angular.json
@@ -24,6 +22,12 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "OCER_APP_ANGULAR_UI", "OCER
 		..\..\..\..\..\Projects\Angular\OCER-APP-UI\tsconfig.json = ..\..\..\..\..\Projects\Angular\OCER-APP-UI\tsconfig.json
 		..\..\..\..\..\Projects\Angular\OCER-APP-UI\tslint.json = ..\..\..\..\..\Projects\Angular\OCER-APP-UI\tslint.json
 	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{89D07158-FD33-4066-85FC-E51651DB3379}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{6FB87ADD-DF76-400D-95D0-BE3EDA6C836D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Application.Business.Tests", "Application.Business.Tests\Application.Business.Tests.csproj", "{5AFD200B-06BD-42FE-AFB8-71BB91A52962}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -43,23 +47,34 @@ Global
 		{B3BC72C0-4B6F-4033-AEA7-DBC02D307DB2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B3BC72C0-4B6F-4033-AEA7-DBC02D307DB2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B3BC72C0-4B6F-4033-AEA7-DBC02D307DB2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B3BC72C0-4B6F-4033-AEA7-DBC02D307DB2}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
 		{583AE0E8-82BE-4319-9348-E29AFA591423}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{583AE0E8-82BE-4319-9348-E29AFA591423}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{583AE0E8-82BE-4319-9348-E29AFA591423}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{583AE0E8-82BE-4319-9348-E29AFA591423}.Release|Any CPU.Build.0 = Release|Any CPU
+		{583AE0E8-82BE-4319-9348-E29AFA591423}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
 		{63CC3E99-5C14-4FCE-B3F8-94D27ED7C294}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{63CC3E99-5C14-4FCE-B3F8-94D27ED7C294}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{63CC3E99-5C14-4FCE-B3F8-94D27ED7C294}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{63CC3E99-5C14-4FCE-B3F8-94D27ED7C294}.Release|Any CPU.Build.0 = Release|Any CPU
-		{60AD09C2-3BCE-4777-865C-CA0330050DEE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{60AD09C2-3BCE-4777-865C-CA0330050DEE}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{60AD09C2-3BCE-4777-865C-CA0330050DEE}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{60AD09C2-3BCE-4777-865C-CA0330050DEE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5AFD200B-06BD-42FE-AFB8-71BB91A52962}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5AFD200B-06BD-42FE-AFB8-71BB91A52962}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5AFD200B-06BD-42FE-AFB8-71BB91A52962}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5AFD200B-06BD-42FE-AFB8-71BB91A52962}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {F9AF1880-4A03-449D-AE75-5775392AC35C}
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{B3BC72C0-4B6F-4033-AEA7-DBC02D307DB2} = {89D07158-FD33-4066-85FC-E51651DB3379}
+		{63CC3E99-5C14-4FCE-B3F8-94D27ED7C294} = {89D07158-FD33-4066-85FC-E51651DB3379}
+		{9D5AF98A-9224-4150-B78C-C36D728818E8} = {89D07158-FD33-4066-85FC-E51651DB3379}
+		{34B74669-4B22-4C36-A71F-143F2415FE93} = {89D07158-FD33-4066-85FC-E51651DB3379}
+		{583AE0E8-82BE-4319-9348-E29AFA591423} = {89D07158-FD33-4066-85FC-E51651DB3379}
+		{6FB87ADD-DF76-400D-95D0-BE3EDA6C836D} = {89D07158-FD33-4066-85FC-E51651DB3379}
+		{5AFD200B-06BD-42FE-AFB8-71BB91A52962} = {6FB87ADD-DF76-400D-95D0-BE3EDA6C836D}
 	EndGlobalSection
 EndGlobal

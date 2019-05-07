@@ -1,14 +1,14 @@
 ﻿using Application.Business;
-using Application.Core;
 using Application.Core.Models;
 using Application.Core.Models.ViewModels;
-using Application.Infrastructure.DAL;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Application.Infrastructure.DAL.UnitOfWork;
+using Microsoft.IdentityModel.Tokens;
 
 namespace Application.API.Controllers
 {
@@ -17,28 +17,15 @@ namespace Application.API.Controllers
     [ApiController]
     public class UserEquipmentsController : ControllerBase
     {
-
-        private readonly IRepository<UserEquipments> _repository;
-
-        private readonly IRepository<EquipmentTypes> _equipmentTypesRepository;
-
-        private readonly IRepository<Equipments> _equipmentsRepository;
+        private readonly IUnitOfWork _unitOfWork;
 
         private readonly IPriceCalculator _priceCalculator;
 
-        private readonly IRepository<RentalFeeTypes> _rentalFeeTypesRepository;
-
-        public UserEquipmentsController(IRepository<UserEquipments> repository,
-            IRepository<EquipmentTypes> equipmentTypesRepository,
-            IRepository<Equipments> equipmentsRepository,
-            IPriceCalculator priceCalculator,
-            IRepository<RentalFeeTypes> rentalFeeTypesRepository)
+        public UserEquipmentsController(IUnitOfWork unitOfWork,
+            IPriceCalculator priceCalculator)
         {
-            _repository = repository;
-            _equipmentTypesRepository = equipmentTypesRepository;
-            _equipmentsRepository = equipmentsRepository;
             _priceCalculator = priceCalculator;
-            _rentalFeeTypesRepository = rentalFeeTypesRepository;
+            _unitOfWork = unitOfWork;
         }
 
 
@@ -47,7 +34,7 @@ namespace Application.API.Controllers
         {
             try
             {
-                return await _repository.Where(x => x.UserId == userId).CountAsync();
+                return await _unitOfWork.UserEquipmentRepository.Query(x => x.UserId == userId).CountAsync();
             }
             catch (Exception ex)
             {
@@ -55,21 +42,20 @@ namespace Application.API.Controllers
             }
         }
 
-
         [HttpPost, Route("Add")]
         public async Task<bool> AddEquipment([FromBody] UserEquipmentViewModel model)
         {
             try
             {
-
-                await _repository.Add(new UserEquipments
+                await _unitOfWork.UserEquipmentRepository.InsertAsync(new UserEquipments
                 {
+                    Id=(_unitOfWork.UserEquipmentRepository.GetAsync(null,x=>x.OrderByDescending(y=>y.Id)).Id)+1,
                     EquipmentId = model.EquipmentId,
                     RentDay = model.UserRentalDay,
                     UserId = model.UserId,
                     OperationDate = DateTime.Now
                 });
-
+                await _unitOfWork.SaveAsync();
                 return true;
             }
             catch (Exception ex)
@@ -78,15 +64,18 @@ namespace Application.API.Controllers
             }
         }
 
-
-        [HttpPost, Route("RemoveEquipment")]
-        public async Task<bool> RemoveEquipment([FromHeader] int userId, [FromHeader] int equipmentId)
+        [HttpPost("{InvoiceId}"), Route("RemoveEquipment/{InvoiceId}")]
+        public async Task<bool> RemoveEquipment([FromHeader] int userId, [FromQuery] int InvoiceId)
         {
             try
             {
-                var item = _repository.Where(x => x.UserId == userId && x.EquipmentId == equipmentId);
-                if (item.Any())
-                    await _repository.Delete(item.First());
+                var item = _unitOfWork.UserEquipmentRepository.GetFirstOrDefaultAsync(x =>
+                    x.UserId == userId && x.Id == InvoiceId);
+                if (item?.Result != null)
+                {    
+                    await _unitOfWork.UserEquipmentRepository.DeleteAsync(item);
+                    await _unitOfWork.SaveAsync();
+                }
 
                 return true;
             }
@@ -97,48 +86,54 @@ namespace Application.API.Controllers
         }
 
         [HttpGet("{EquipmentId}"), Route("GetEquipment/{EquipmentId}")]
-        public IEnumerable<Equipments> GetEquipment(int equipmentId)
+        public async Task<List<Equipments>> GetEquipment(int equipmentId)
         {
             if (equipmentId == 0)
-                return _equipmentsRepository.All();
-            return _equipmentsRepository.Where(x => x.Id == equipmentId);
+                return await _unitOfWork.EquipmentsRepository.GetAsync();
+            return await _unitOfWork.EquipmentsRepository.GetAsync(x => x.Id == equipmentId);
         }
-
 
         [HttpGet, Route("EquipmentList")]
         public async Task<IEnumerable<UserEquipmentViewModel>> EquipmentList([FromHeader] string userId,
             [FromHeader] int equipmentId)
         {
-            List<Equipments> equipments = null;
-            if (equipmentId != 0)
-                equipments = await _equipmentsRepository.Where(x => x.Id == equipmentId).ToListAsync();
-            else
-                equipments = await _equipmentsRepository.All().ToListAsync();
+            List<Equipments> equipments =  await _unitOfWork.EquipmentsRepository.Query().ToListAsync();
+             
+            var returnList = await GetExtendedEquipmentViewModel(equipments);
 
-            List<UserEquipmentViewModel> returnList = GetExtendedEquipmentViewModel(equipments);
+            return returnList;
+        }
+        
+        [HttpGet, Route("EquipmentListById")]
+        public async Task<IEnumerable<UserEquipmentViewModel>>  EquipmentListById([FromHeader] string userId,
+            [FromHeader] int equipmentId)
+        {
+            List<Equipments> equipments = await _unitOfWork.EquipmentsRepository.GetAsync(x => x.Id == equipmentId);
+
+            var returnList = await GetExtendedEquipmentViewModel(equipments);
 
             return returnList;
         }
 
-
         [HttpGet, Route("GenerateReport")]
         public async Task<Invoice> GenerateReport([FromHeader] int userId)
         {
-            Invoice invoice = new Invoice() { Equipments = new List<InvoiceOfEquipment>() };
+            Invoice invoice = new Invoice() {Equipments = new List<InvoiceOfEquipment>()};
 
-            var userEquipments = await _repository.Where(x => x.UserId == userId).ToListAsync();
+            var userEquipments = await _unitOfWork.UserEquipmentRepository.GetAsync(x => x.UserId == userId);
 
-            var equipmentTypes = _equipmentTypesRepository.All();
+            var equipmentTypes = await _unitOfWork.EquipmentTypesRepository.GetAsync();
 
-            for (int i = 0; i < userEquipments.Count; i++)
+            foreach (var item in userEquipments)
             {
-                var item = userEquipments[i];
-
-                var equipment = await _equipmentsRepository.Where(x => x.Id == item.EquipmentId).SingleAsync();
+                var item1 = item;
+                var equipment = await _unitOfWork.EquipmentsRepository.Query(x => x.Id == item1.EquipmentId)
+                    .SingleAsync();
 
                 item.EquipmentTypeId = equipment.Type;
 
-                var price = _priceCalculator.CalculateRentalFee(equipment, item.RentDay, _rentalFeeTypesRepository.All());
+                var price = _priceCalculator.CalculateRentalFee(equipment, item.RentDay,
+                    _unitOfWork.RentalFeeTypesRepository.Query());
 
                 invoice.TotalPrice += price;
 
@@ -161,23 +156,23 @@ namespace Application.API.Controllers
             return invoice;
         }
 
-
         [HttpGet, Route("EquipmentTypes")]
-        public List<EquipmentTypes> EquipmentTypes()
+        public async Task<List<EquipmentTypes>> EquipmentTypes()
         {
-            return _equipmentTypesRepository.All().ToList();
+            return await _unitOfWork.EquipmentTypesRepository.GetAsync();
         }
 
         #region Private Methods 
 
-        private List<UserEquipmentViewModel> GetExtendedEquipmentViewModel(IEnumerable<Equipments> model)
+        private async Task<List<UserEquipmentViewModel>> GetExtendedEquipmentViewModel(IEnumerable<Equipments> model)
         {
-            List<UserEquipmentViewModel> returnList = new List<UserEquipmentViewModel>();
+            var returnList = new List<UserEquipmentViewModel>();
 
             foreach (var item in model)
             {
                 int equipmentTypeId = item.Type;
-                var equipmentType = _equipmentTypesRepository.Where(x => x.Id == equipmentTypeId).Single();
+                var equipmentType =
+                    await _unitOfWork.EquipmentTypesRepository.GetFirstOrDefaultAsync(x => x.Id == equipmentTypeId);
 
                 returnList.Add(new UserEquipmentViewModel
                 {
@@ -188,14 +183,11 @@ namespace Application.API.Controllers
                     EquipmentTypeId = item.Type
                 });
             }
+            
+          
 
             return returnList;
         }
-
-
-
-
-
 
         #endregion
     }

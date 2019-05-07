@@ -6,7 +6,7 @@ using System.Linq;
 
 namespace Application.Business
 {
-   public class PriceCalculator:IPriceCalculator
+   public   class PriceCalculator:IPriceCalculator
     {
 
         private readonly IRepository<EquipmentTypes>  _equipmentTypesRepository;
@@ -18,21 +18,17 @@ namespace Application.Business
             _equipmentTypesRepository = equipmentTypesRepository;
         }
 
-        public virtual int FindPreDefinedDay(Equipments model)
+        public int FindPreDefinedDay(Equipments model)
         {
             int equipmentType = (int)model.Type;
 
-            return (from q in _equipmentTypesRepository.Table
-                    where q.Id == equipmentType
-                    select new
-                    {
-                        q.PreDefinedDay}).Single().PreDefinedDay;
+            return  _equipmentTypesRepository.Query(x => x.Id == equipmentType).Single().PreDefinedDay;
         }
 
-        public virtual int CalculateLoyaltyPoint(List<UserEquipments> model)
+        public int CalculateLoyaltyPoint(List<UserEquipments> model)
         {
             var loyaltyPoint = 0;
-
+                                          
             foreach (var item in model)
             {
                 loyaltyPoint += (item.EquipmentTypeId == (int)EnmEquipmentTypes.Heavy) ? 2 : 1;
@@ -41,16 +37,16 @@ namespace Application.Business
             return loyaltyPoint;
         }
 
-        public virtual  decimal CalculateRentalFee(Equipments equipment,int rentDay,IQueryable<RentalFeeTypes> feeTypes)
+        public decimal CalculateRentalFee(Equipments equipment,int rentDay,IQueryable<RentalFeeTypes> feeTypes)
         {
             decimal resultFee = 0m;
 
             var preDefinedDay = FindPreDefinedDay(equipment);
 
 
-            string OneTimeRentalFee = nameof(EnmFeeTypes.OneTimeRentalFee);
-            string PremiumDailyFee = nameof(EnmFeeTypes.PremiumDailyFee);
-            string RegularDailyFee = nameof(EnmFeeTypes.RegularDailyFee);
+            var OneTimeRentalFee = nameof(EnmFeeTypes.OneTimeRentalFee);
+            var PremiumDailyFee = nameof(EnmFeeTypes.PremiumDailyFee);
+            var RegularDailyFee = nameof(EnmFeeTypes.RegularDailyFee);
 
             switch (equipment.Type)
             {

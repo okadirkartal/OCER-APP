@@ -13,6 +13,7 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
+using Application.Web.Services;
 using ViewModels = Application.Core.Models.ViewModels;
 
 namespace Application.Web.Controllers
@@ -21,42 +22,25 @@ namespace Application.Web.Controllers
     {
         private readonly IMemoryCache _cache;
 
-        private readonly HttpClient _client = new HttpClient();
-
-        private readonly IConfiguration _configuration;
+        private readonly IEquipmentService _equipmentService;
 
         private readonly IHttpContextAccessor _accessor;
+             
+        private Dictionary<string, int> _headerDictionary;
 
-        public HomeController(IConfiguration configuration, IMemoryCache cache, IHttpContextAccessor accessor)
+        public HomeController(IEquipmentService equipmentService, IMemoryCache cache, IHttpContextAccessor accessor)
         {
             _accessor = accessor;
-            _configuration = configuration;
-
-            _client.BaseAddress = new Uri(_configuration.GetSection("ApplicationSettings:BaseApiUrl").Value);
-            _client.DefaultRequestHeaders.Accept.Clear();
-
-            _client.DefaultRequestHeaders.Accept.Add(
-                new MediaTypeWithQualityHeaderValue("application/json"));
-
-            _client.DefaultRequestHeaders.Add("UserId", GetUserId().ToString());
-
-            _cache = cache;
+            _equipmentService = equipmentService; 
+            _cache = cache;        
+            _headerDictionary= new Dictionary<string, int>(); 
         }
 
         [HttpGet]
         private async Task<Equipments> GetEquipment(int equipmentId)
         {
-            Equipments result = null;
-
-            HttpResponseMessage response =
-                await _client.GetAsync($"UserEquipments/EquipmentList/{GetUserId()}/{equipmentId}");
-
-            if (response.IsSuccessStatusCode)
-            {
-                result = await response.Content.ReadAsAsync<Equipments>();
-            }
-
-            return result;
+            return await _equipmentService.GetAsync<Equipments>(
+                $"EquipmentList/{GetUserId()}/{equipmentId}"); 
         }
 
 
@@ -71,7 +55,7 @@ namespace Application.Web.Controllers
 
             if (cachedStock == null)
             {
-                response = await _client.GetAsync($"UserEquipments/EquipmentList");
+                response = await _equipmentService.GetAsync("EquipmentList");
 
                 List<ViewModels.UserEquipmentViewModel> result = null;
                 if (response.IsSuccessStatusCode)
@@ -88,7 +72,7 @@ namespace Application.Web.Controllers
 
             var equipmentCount = 0;
 
-            response = await _client.GetAsync($"UserEquipments/UserEquipmentCount");
+            response = await _equipmentService.GetAsync("UserEquipmentCount");
 
             if (response.IsSuccessStatusCode)
             {
@@ -107,16 +91,13 @@ namespace Application.Web.Controllers
             if (ViewData["UserEquipmentViewModel"] != null)
                 return View((ViewModels.UserEquipmentViewModel)ViewData["UserEquipmentViewModel"]);
 
-            AddHeader("equipmentId", equipmentId.ToString());
-            HttpResponseMessage response = await _client.GetAsync($"UserEquipments/EquipmentList/");
-
-            List<ViewModels.UserEquipmentViewModel> result = null;
-            if (response.IsSuccessStatusCode)
-            {
-                
-                result = await response.Content.ReadAsAsync<List<ViewModels.UserEquipmentViewModel>>();
-            }
-            var item = result.Single();
+            _headerDictionary.Clear();
+            _headerDictionary.Add("UserId",GetUserId());
+            _headerDictionary.Add("equipmentId", equipmentId);
+            _equipmentService.AddHeader(_headerDictionary);
+            var result = await _equipmentService.GetAsync<List<ViewModels.UserEquipmentViewModel>>("EquipmentListById");
+           
+            var item = (result ?? throw new ArgumentException()).Single();
 
             return View(item);
         }
@@ -135,7 +116,7 @@ namespace Application.Web.Controllers
              
             model.UserId = GetUserId();
 
-            HttpResponseMessage response = await _client.PostAsJsonAsync("UserEquipments/Add/", model);
+            HttpResponseMessage response = await _equipmentService.PostAsJsonAsync<ViewModels.UserEquipmentViewModel>("Add/", model);
 
             if (response.IsSuccessStatusCode)
             {
@@ -174,13 +155,15 @@ namespace Application.Web.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> RemoveEquipment(string equipmentId)
+        public async Task<IActionResult> RemoveEquipment(int InvoiceId)
         {
             ViewBag.Title = "Remove Item";
-
-            AddHeader("equipmentId", equipmentId.ToString());
-            HttpResponseMessage response =
-                await _client.PostAsJsonAsync($"UserEquipments/RemoveEquipment/", new { equipmentId });
+                                  
+            _headerDictionary.Clear();
+            _headerDictionary.Add("UserId",GetUserId());
+            
+            _equipmentService.AddHeader(_headerDictionary);
+             await _equipmentService.PostAsJsonAsync<string>($"RemoveEquipment/{InvoiceId}",null);
 
             return RedirectToAction("Report");
         }
@@ -197,19 +180,14 @@ namespace Application.Web.Controllers
         {
             Invoice result = null;
 
-            HttpResponseMessage response = await _client.GetAsync($"UserEquipments/GenerateReport/");
+            HttpResponseMessage response = await _equipmentService.GetAsync("GenerateReport/");
 
             if (response.IsSuccessStatusCode)
             {
                 result = await response.Content.ReadAsAsync<Invoice>();
             }
             return result;
-        }
-
-        private void AddHeader(string name, string value)
-        {
-            _client.DefaultRequestHeaders.Add(name, value);
-        }
+        } 
 
         private int GetUserId()
         {

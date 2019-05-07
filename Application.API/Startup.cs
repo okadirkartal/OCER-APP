@@ -1,5 +1,6 @@
 ﻿using Application.Business;
 using Application.Infrastructure.DAL;
+using Application.Infrastructure.DAL.UnitOfWork;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Cors.Infrastructure;
 using Microsoft.AspNetCore.Hosting;
@@ -46,6 +47,7 @@ namespace Application.API
             });
  
             services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
+            services.AddScoped<IUnitOfWork, UnitOfWork>();
             services.AddScoped(typeof(IPriceCalculator), typeof(PriceCalculator));
 
             services.AddCors(options => { options.AddPolicy("AllowOrigin", GenerateCorsPolicy()); });

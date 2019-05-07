@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Application.Infrastructure.DAL
 {
-    public class ApplicationDBContext : DbContext
+    public   class ApplicationDBContext : DbContext
     {
         public ApplicationDBContext(DbContextOptions<ApplicationDBContext> context) : base(context)
         {

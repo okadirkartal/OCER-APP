@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
@@ -8,13 +9,23 @@ namespace Application.Infrastructure.DAL
 {
     public interface IRepository<T> where T : class
     {
-        DbSet<T> Table { get; }
-        Task<bool> Add(T entity);
-        Task<bool> Update(T entity);
-        Task<bool> Delete(T entity);
 
-        IQueryable<T> All();
-        IQueryable<T> Where(Expression<Func<T, bool>> where);
-        IQueryable<T> OrderBy<TKey>(Expression<Func<T, TKey>> orderBy, bool isDesc);
+
+        Task<List<T>> GetAsync(Expression<Func<T, bool>> filter = null, Func<IQueryable<T>, IOrderedQueryable<T>> orderBy = null,
+            params Expression<Func<T, object>>[] includes);
+
+        IQueryable<T> Query(Expression<Func<T, bool>> filter = null,
+            Func<IQueryable<T>, IOrderedQueryable<T>> orderBy = null);
+
+        Task<T> GetByIdAsync(object id);
+
+        Task<T> GetFirstOrDefaultAsync(Expression<Func<T, bool>> filter = null, params Expression<Func<T, object>>[] includes);
+
+        
+        Task InsertAsync(T entity);
+        void Update(T entity);
+        Task DeleteAsync(object id);
+
+        
     }
 }
